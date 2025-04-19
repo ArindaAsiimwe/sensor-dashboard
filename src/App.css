@@ -1,38 +1,329 @@
-.App {
+/* SensorDashboard.css */
+
+.dashboard-container {
+  padding: 1.5rem;
+  /* background-color: rgb(217, 238, 202); */
+  background-color: rgb(245, 241, 188);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(192, 164, 164, 0.1);
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.dashboard-title {
+  font-size: 2rem; /* Larger title for better prominence */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #333;
   text-align: center;
+  width: 100%;
+  max-width: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.time-range-select {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+  max-width: 200px; /* Max width to keep the control in proportion */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.summary {
+  margin-bottom: 2rem;
+  text-align: center; /* Center summary text */
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
+  gap: 1.5rem; /* Increased gap for better spacing */
+  margin-top: 2rem;
+  justify-items: center;
+}
+
+.chart-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 100%; 
+  padding: 5px;
+  background-color: #95d3ec;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+ 
 }
 
-.App-link {
-  color: #61dafb;
+.chart-section h2,
+.chart-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #333;
+  text-align: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.pie-chart-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 1rem;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 600px) {
+  .chart-grid {
+    grid-template-columns: 1fr; /* Stack chart sections on small screens */
   }
-  to {
-    transform: rotate(360deg);
+
+  .chart-section h2,
+  .chart-section h3 {
+    font-size: 1rem; /* Smaller text for better readability */
   }
+
+  .recharts-responsive-container {
+  width: 100%!important;
+    min-height: auto;
+  }
+
+  .pie-chart-wrapper {
+    max-width: 100%; /* Make pie charts full width on small screens */
+  }
+
+  .time-range-select {
+    max-width: 100%; /* Expand the time range control on small screens */
+  }
+}
+
+/* Specific sizes for chart containers */
+.area-chart-container {
+  width: 100%;
+
+  height: auto;
+  min-height: 300px;
+}
+
+.line-chart-container {
+  width: 100%;
+
+  height: auto;
+  min-height: 300px;
+}
+
+.pie-chart-container {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  min-height: 450px;
+}
+
+/* Remove all outlines and borders from pie chart elements */
+.pie-chart-container *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Add smooth hover effect */
+.pie-chart-container .recharts-pie-sector {
+  transition: all 0.3s ease;
+}
+
+.pie-chart-container .recharts-pie-sector:hover {
+  filter: brightness(1.2);
+}
+
+/* Alarms Section Styles */
+.alarms-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alarms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.alarm-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.alarm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alarm-active {
+  border-left: 4px solid #ff4444;
+  background-color: #fff5f5;
+}
+
+.alarm-ok {
+  border-left: 4px solid #00C851;
+  background-color: #f5fff5;
+}
+
+.alarm-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.alarm-state {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alarm-metric {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.alarm-description {
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.alarm-timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.no-alarms {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-alarms p {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.alarm-steps {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 1rem;
+}
+
+.alarm-steps li {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+/* Alerts Section Styles */
+.alerts-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.alert-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alert-active {
+  border-left: 4px solid #ffbb33;
+  background-color: #fff9e6;
+}
+
+.alert-ok {
+  border-left: 4px solid #00C851;
+  background-color: #f5fff5;
+}
+
+.alert-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.alert-state {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alert-metric {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.alert-description {
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.alert-timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.no-alerts {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-alerts p {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.alert-steps {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 1rem;
+}
+
+.alert-steps li {
+  margin-bottom: 0.5rem;
+  color: #666;
 }

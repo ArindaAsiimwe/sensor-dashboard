@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import '../App.css';
 import React, { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { listSensorsData } from '../graphql/queries';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Label } from 'recharts';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { AreaChart, Area } from 'recharts';
-
 
 // Format timestamp for x-axis
 function formatTimestamp(ts) {
@@ -21,7 +21,12 @@ function SensorDashboard() {
 
   useEffect(() => {
     fetchSensors();
-  }, [fetchSensors, timeRange]);
+    // Set up interval to refresh data every 5 minutes
+    const refreshInterval = setInterval(() => {
+      fetchSensors();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(refreshInterval);
+  }, [timeRange]);
 
   function getTimeRangeLabel(value) {
     switch (value) {
@@ -31,7 +36,6 @@ function SensorDashboard() {
       default: return "All Time";
     }
   }
-  
 
   async function fetchSensors() {
     try {
@@ -87,7 +91,6 @@ function SensorDashboard() {
   const batteryVals = sensors.map(s => s.battery_voltage).filter(v => v != null);
 
   const COLORS = ['#FF8042', '#00C49F', '#0088FE'];
-  
 
   // Group temperature ranges
   const tempGroups = [
@@ -109,13 +112,20 @@ function SensorDashboard() {
     { name: "3.0 - 3.5V", value: sensors.filter(s => s.battery_voltage >= 3.0 && s.battery_voltage <= 3.5).length },
     { name: "> 3.5V", value: sensors.filter(s => s.battery_voltage > 3.5).length },
   ];
-  
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Sensor Dashboard</h1>
+    <div className="dashboard-container">
+      <h1 className="dashboard-title">Sensor Dashboard</h1>
 
-      <div className="my-4">
+      <div className="summary">
+        <h2 className="text-lg font-medium">Summary</h2>
+        <p> Showing <strong>{sensors.length}</strong> data points ({getTimeRangeLabel(timeRange)}) </p>
+        <p>Temperature: {Math.min(...tempVals)}°C to {Math.max(...tempVals)}°C</p>
+        <p>Humidity: {Math.min(...humidVals)}% to {Math.max(...humidVals)}%</p>
+        <p>Avg Battery Voltage: {batteryVals.length ? (batteryVals.reduce((a, b) => a + b, 0) / batteryVals.length).toFixed(2) : "N/A"} V</p>
+      </div>
+      
+      <div className="time-range-select">
         <label className="mr-2 font-medium">Time Range:</label>
         <select
           value={timeRange}
@@ -129,157 +139,123 @@ function SensorDashboard() {
         </select>
       </div>
 
-      <div className="my-4">
-        <h2 className="text-lg font-medium">Summary</h2>
-        <p> Showing <strong>{sensors.length}</strong> data points ({getTimeRangeLabel(timeRange)}) </p>
-        <p>Temperature: {Math.min(...tempVals)}°C to {Math.max(...tempVals)}°C</p>
-        <p>Humidity: {Math.min(...humidVals)}% to {Math.max(...humidVals)}%</p>
-        <p>Avg Battery Voltage: {batteryVals.length ? (batteryVals.reduce((a, b) => a + b, 0) / batteryVals.length).toFixed(2) : "N/A"} V</p>
+      {/* Organized Charts */}
+      <div className="chart-grid">
+        <div className="chart-section">
+          <h2>Temperature vs Time</h2>
+          <div className="area-chart-container">
+            <AreaChart width={350} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
+                <Label value="Time" position="insideBottom" offset={-5} />
+              </XAxis>
+              <YAxis>
+                <Label value="Temperature (°C)" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip labelFormatter={formatTimestamp} />
+              <Area type="monotone" dataKey="temperature" stroke="#ff7300" fill="#ff7300" dot={false} />
+            </AreaChart>
+          </div>
+        </div>
+
+        <div className="chart-section">
+          <h2>Humidity vs Time</h2>
+          <div className="area-chart-container">
+            <AreaChart width={300} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
+                <Label value="Time" position="insideBottom" offset={-5} />
+              </XAxis>
+              <YAxis>
+                <Label value="Humidity (%)" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip labelFormatter={formatTimestamp} />
+              <Area type="monotone" dataKey="humidity" stroke="#00bfff" fill="#00bfff" dot={false} />
+            </AreaChart>
+          </div>
+        </div>
+
+        <div className="chart-section">
+          <h2>Battery Voltage vs Time</h2>
+          <div className="area-chart-container">
+            <AreaChart width={300} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
+                <Label value="Time" position="insideBottom" offset={-5} />
+              </XAxis>
+              <YAxis>
+                <Label value="Voltage (V)" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip labelFormatter={formatTimestamp} />
+              <Area type="monotone" dataKey="battery_voltage" stroke="#82ca9d" fill="#82ca9d" dot={false} />
+            </AreaChart>
+          </div>
+        </div>
+
+        <div className="chart-section">
+          <h2>All Metrics Over Time</h2>
+          <div className="line-chart-container">
+            <LineChart width={380} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
+                <Label value="Time" position="insideBottom" offset={-5} />
+              </XAxis>
+              <YAxis>
+                <Label value="Value" angle={-90} position="insideLeft" />
+              </YAxis>
+              <Tooltip labelFormatter={formatTimestamp} />
+              <Line type="monotone" dataKey="temperature" stroke="#ff7300" dot={false} name="Temperature (°C)" />
+              <Line type="monotone" dataKey="humidity" stroke="#00bfff" dot={false} name="Humidity (%)" />
+              <Line type="monotone" dataKey="battery_voltage" stroke="#82ca9d" dot={false} name="Battery (V)" />
+            </LineChart>
+          </div>
+        </div>
       </div>
 
-      
-      {/* Temperature Chart */} 
-      <div className="flex flex-col items-center my-8">
-        <h2 className="text-xl font-semibold mb-4">Temperature vs Time</h2>
-        <AreaChart width={800} height={300} data={sensors} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={formatTimestamp} label={{ value: "Time", position: "insideBottomRight", offset: -5 }} />
-          <YAxis label={{ value: "Temperature (°C)", angle: -90, position: 'insideLeft' }} />
-          <Tooltip labelFormatter={formatTimestamp} />
-          <Area type="monotone" dataKey="temperature" stroke="#ff7300" fill="#ff7300" dot={false} />
-        </AreaChart>
+      {/* Pie Charts Section */}
+      <div className="chart-grid">
+        <div className="chart-section pie-chart-wrapper">
+          <h3>Temperature Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie data={tempGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                {tempGroups.map((_, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="chart-section pie-chart-wrapper">
+          <h3>Humidity Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie data={humidityGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                {humidityGroups.map((_, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="chart-section pie-chart-wrapper">
+          <h3>Battery Voltage Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie data={batteryGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                {batteryGroups.map((_, index) => (
+                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Legend verticalAlign="bottom" height={36} />
+            </PieChart>
+          </div>
+        </div>
       </div>
-
-      {/* Humidity Chart */}
-      <div className="flex flex-col items-center my-8">
-        <h2 className="text-xl font-semibold mb-4">Humidity vs Time</h2>
-        <AreaChart width={800} height={300} data={sensors} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={formatTimestamp} label={{ value: "Time", position: "insideBottomRight", offset: -5 }} />
-          <YAxis label={{ value: "Humidity (%)", angle: -90, position: 'insideLeft' }} />
-          <Tooltip labelFormatter={formatTimestamp} />
-          <Area type="monotone" dataKey="humidity" stroke="#00bfff" fill="#00bfff" dot={false} />
-        </AreaChart>
-      </div>
-
-      {/* Battery Voltage Chart */}
-      <div className="flex flex-col items-center my-8">
-        <h2 className="text-xl font-semibold mb-4">Battery Voltage vs Time</h2>
-        <AreaChart width={800} height={300} data={sensors} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={formatTimestamp} label={{ value: "Time", position: "insideBottomRight", offset: -5 }} />
-          <YAxis label={{ value: "Voltage (V)", angle: -90, position: 'insideLeft' }} />
-          <Tooltip labelFormatter={formatTimestamp} />
-          <Area type="monotone" dataKey="battery_voltage" stroke="#82ca9d" fill="#82ca9d" dot={false} />
-        </AreaChart>
-      </div>
-
-      {/* Combined Chart */}
-      <div className="flex flex-col items-center my-8">
-        <h2 className="text-xl font-semibold mb-4">All Metrics Over Time</h2>
-        <LineChart width={900} height={350} data={sensors} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={formatTimestamp} />
-          <YAxis />
-          <Tooltip labelFormatter={formatTimestamp} />
-          <Line type="monotone" dataKey="temperature" stroke="#ff7300" dot={false} name="Temperature (°C)" />
-          <Line type="monotone" dataKey="humidity" stroke="#00bfff" dot={false} name="Humidity (%)" />
-          <Line type="monotone" dataKey="battery_voltage" stroke="#82ca9d" dot={false} name="Battery (V)" />
-        </LineChart>
-      </div>
-
-     {/* Pie Charts */}
-    <div className="flex flex-row flex-wrap justify-center items-start gap-8 my-8">
-
-      {/* Temperature Pie */}
-      <div className="flex flex-col items-center w-[300px]">
-        <h3 className="text-center font-medium mb-2">Temperature Distribution</h3>
-        <PieChart width={300} height={300}>
-          <Pie
-            data={tempGroups}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {tempGroups.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Legend verticalAlign="bottom" height={36} />
-        </PieChart>
-      </div>
-
-      {/* Humidity Pie Chart */}
-      <div className="flex flex-col items-center w-[300px]">
-        <h3 className="text-center font-medium mb-2">Humidity Distribution</h3>
-        <PieChart width={300} height={300}>
-          <Pie
-            data={humidityGroups}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {humidityGroups.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Legend verticalAlign="bottom" height={36} />
-        </PieChart>
-      </div>
-
-      {/* Battery Voltage Pie Chart */}
-      <div className="flex flex-col items-center w-[300px]">
-        <h3 className="text-center font-medium mb-2">Battery Voltage Distribution</h3>
-        <PieChart width={300} height={300}>
-          <Pie
-            data={batteryGroups}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            label
-          >
-            {batteryGroups.map((_, index) => (
-              <Cell key={index} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Legend verticalAlign="bottom" height={36} />
-        </PieChart>
-      </div>
-
-    </div>
-
-
-      {/* Data Table */}
-      {/* <div className="overflow-x-auto mt-6">
-         <table className="table-auto border-collapse border border-gray-300 w-full">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Time</th>
-              <th className="border px-4 py-2">Temp</th>
-              <th className="border px-4 py-2">Humidity</th>
-              <th className="border px-4 py-2">Battery</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sensors.map((s, i) => (
-              <tr key={i}>
-                <td className="border px-4 py-2">{s.timestamp ? new Date(s.timestamp).toLocaleString() : "N/A"}</td>
-                <td className="border px-4 py-2">{s.temperature}</td>
-                <td className="border px-4 py-2">{s.humidity}</td>
-                <td className="border px-4 py-2">{s.battery_voltage}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table> 
-      </div> */}
     </div>
   );
 }
