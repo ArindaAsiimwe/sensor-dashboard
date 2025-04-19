@@ -6,6 +6,8 @@ import { listSensorsData } from '../graphql/queries';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Label, BarChart, Bar, ResponsiveContainer } from 'recharts';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { AreaChart, Area } from 'recharts';
+import { WiThermometer, WiThermometerExterior, WiThermometerInternal } from 'react-icons/wi';
+import { FaTemperatureHigh, FaTemperatureLow, FaTemperatureQuarter } from 'react-icons/fa6';
 
 // Format timestamp for x-axis
 function formatTimestamp(ts) {
@@ -45,6 +47,43 @@ function calculateDailyAverages(sensors) {
     battery_voltage: (data.battery_voltage / data.count).toFixed(2)
   }));
 }
+
+// Add this function near the other format functions
+function formatDateTime(ts) {
+  if (!ts) return "Invalid";
+  const date = new Date(ts);
+  return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+}
+
+// Update TemperatureLevelIndicator component
+const TemperatureLevelIndicator = ({ temperature }) => {
+  const getTemperatureLevel = (temp) => {
+    if (temp >= 30) return { 
+      icon: <FaTemperatureHigh size={24} />, 
+      color: '#ff4444', 
+      label: 'High' 
+    };
+    if (temp >= 20) return { 
+      icon: <FaTemperatureQuarter size={24} />, 
+      color: '#ffbb33', 
+      label: 'Moderate' 
+    };
+    return { 
+      icon: <FaTemperatureLow size={24} />, 
+      color: '#00C851', 
+      label: 'Low' 
+    };
+  };
+
+  const level = getTemperatureLevel(temperature);
+
+  return (
+    <div className="temperature-indicator">
+      {level.icon}
+      <span style={{ color: level.color, marginLeft: '0.5rem' }}>{level.label}</span>
+    </div>
+  );
+};
 
 function SensorDashboard() {
   const [sensors, setSensors] = useState([]);
@@ -157,6 +196,7 @@ function SensorDashboard() {
         <p>Temperature: {Math.min(...tempVals)}°C to {Math.max(...tempVals)}°C</p>
         <p>Humidity: {Math.min(...humidVals)}% to {Math.max(...humidVals)}%</p>
         <p>Avg Battery Voltage: {batteryVals.length ? (batteryVals.reduce((a, b) => a + b, 0) / batteryVals.length).toFixed(2) : "N/A"} V</p>
+        <TemperatureLevelIndicator temperature={sensors[sensors.length - 1].temperature} />
       </div>
       
       <div className="time-range-select">
@@ -179,68 +219,124 @@ function SensorDashboard() {
       </div>
       <div className="chart-grid">
         <div className="chart-section">
-          <h2>Temperature vs Time</h2>
+          <h2>Temperature Timeline</h2>
           <div className="area-chart-container">
-            <AreaChart width={350} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+            <AreaChart width={500} height={300} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
-                <Label value="Time" position="insideBottom" offset={-5} />
+              <XAxis 
+                dataKey="timestamp" 
+                tickFormatter={formatDateTime}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              >
+                <Label value="Date & Time" position="insideBottom" offset={-5} />
               </XAxis>
               <YAxis>
                 <Label value="Temperature (°C)" angle={-90} position="insideLeft" />
               </YAxis>
-              <Tooltip labelFormatter={formatTimestamp} />
+              <Tooltip 
+                labelFormatter={formatDateTime}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '10px'
+                }}
+              />
               <Area type="monotone" dataKey="temperature" stroke="#ff7300" fill="#ff7300" dot={false} />
             </AreaChart>
           </div>
         </div>
 
         <div className="chart-section">
-          <h2>Humidity vs Time</h2>
+          <h2>Humidity Timeline</h2>
           <div className="area-chart-container">
-            <AreaChart width={300} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+            <AreaChart width={500} height={300} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
-                <Label value="Time" position="insideBottom" offset={-5} />
+              <XAxis 
+                dataKey="timestamp" 
+                tickFormatter={formatDateTime}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              >
+                <Label value="Date & Time" position="insideBottom" offset={-5} />
               </XAxis>
               <YAxis>
                 <Label value="Humidity (%)" angle={-90} position="insideLeft" />
               </YAxis>
-              <Tooltip labelFormatter={formatTimestamp} />
+              <Tooltip 
+                labelFormatter={formatDateTime}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '10px'
+                }}
+              />
               <Area type="monotone" dataKey="humidity" stroke="#00bfff" fill="#00bfff" dot={false} />
             </AreaChart>
           </div>
         </div>
 
         <div className="chart-section">
-          <h2>Battery Voltage vs Time</h2>
+          <h2>Battery Voltage Timeline</h2>
           <div className="area-chart-container">
-            <AreaChart width={300} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+            <AreaChart width={500} height={300} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
-                <Label value="Time" position="insideBottom" offset={-5} />
+              <XAxis 
+                dataKey="timestamp" 
+                tickFormatter={formatDateTime}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              >
+                <Label value="Date & Time" position="insideBottom" offset={-5} />
               </XAxis>
               <YAxis>
                 <Label value="Voltage (V)" angle={-90} position="insideLeft" />
               </YAxis>
-              <Tooltip labelFormatter={formatTimestamp} />
+              <Tooltip 
+                labelFormatter={formatDateTime}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '10px'
+                }}
+              />
               <Area type="monotone" dataKey="battery_voltage" stroke="#82ca9d" fill="#82ca9d" dot={false} />
             </AreaChart>
           </div>
         </div>
 
         <div className="chart-section">
-          <h2>All Metrics Over Time</h2>
+          <h2>All Metrics Timeline</h2>
           <div className="line-chart-container">
-            <LineChart width={380} height={250} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
+            <LineChart width={500} height={300} data={sensors} margin={{ top: 20, right: 20, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" tickFormatter={formatTimestamp}>
-                <Label value="Time" position="insideBottom" offset={-5} />
+              <XAxis 
+                dataKey="timestamp" 
+                tickFormatter={formatDateTime}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              >
+                <Label value="Date & Time" position="insideBottom" offset={-5} />
               </XAxis>
               <YAxis>
                 <Label value="Value" angle={-90} position="insideLeft" />
               </YAxis>
-              <Tooltip labelFormatter={formatTimestamp} />
+              <Tooltip 
+                labelFormatter={formatDateTime}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '10px'
+                }}
+              />
               <Line type="monotone" dataKey="temperature" stroke="#ff7300" dot={false} name="Temperature (°C)" />
               <Line type="monotone" dataKey="humidity" stroke="#00bfff" dot={false} name="Humidity (%)" />
               <Line type="monotone" dataKey="battery_voltage" stroke="#82ca9d" dot={false} name="Battery (V)" />
@@ -253,7 +349,7 @@ function SensorDashboard() {
       <div className="section-title">
         <h2>PIE CHARTS</h2>
       </div>
-      <div className="chart-grid">
+      <div className="pie-chart-grid">
         <div className="pie-chart-wrapper">
           <h3>Temperature Distribution</h3>
           <div className="pie-chart-container">
