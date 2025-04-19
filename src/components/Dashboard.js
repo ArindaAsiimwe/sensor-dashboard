@@ -6,37 +6,24 @@ import { listSensorsData } from '../graphql/queries';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Label } from 'recharts';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { AreaChart, Area } from 'recharts';
-import { CloudWatchClient, DescribeAlarmsCommand } from '@aws-sdk/client-cloudwatch';
 
 // Format timestamp for x-axis
 function formatTimestamp(ts) {
   return ts ? new Date(ts).toLocaleTimeString() : "Invalid";
 }
 
-// Initialize CloudWatch client with your AWS credentials
-const cloudWatchClient = new CloudWatchClient({
-  region: process.env.REACT_APP_AWS_REGION || 'eu-north-1',
-  credentials: {
-    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY
-  }
-});
-
 function SensorDashboard() {
   const [sensors, setSensors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [timeRange, setTimeRange] = useState("all"); // all, 24h, 1h, 7d
-  const [alarms, setAlarms] = useState([]);
   const client = generateClient();
 
   useEffect(() => {
     fetchSensors();
-    fetchAlarms();
-    // Set up interval to refresh data and alarms every 5 minutes
+    // Set up interval to refresh data every 5 minutes
     const refreshInterval = setInterval(() => {
       fetchSensors();
-      fetchAlarms();
     }, 5 * 60 * 1000);
     return () => clearInterval(refreshInterval);
   }, [timeRange]);
@@ -95,21 +82,6 @@ function SensorDashboard() {
     }
   }
 
-  async function fetchAlarms() {
-    try {
-      const command = new DescribeAlarmsCommand({
-        MaxRecords: 100
-      });
-      
-      const response = await cloudWatchClient.send(command);
-      console.log('CloudWatch response:', response);
-      setAlarms(response.MetricAlarms || []);
-    } catch (err) {
-      console.error('Error fetching alarms:', err);
-      setError('Failed to fetch alarms: ' + err.message);
-    }
-  }
-
   if (loading) return <div>Loading sensors...</div>;
   if (error) return <div>Error loading data: {error}</div>;
 
@@ -165,36 +137,6 @@ function SensorDashboard() {
           <option value="1h">Last 1 hour</option>
           <option value="7d">Last week</option>
         </select>
-      </div>
-
-      {/* Alarms Section */}
-      <div className="alarms-section">
-        <h2 className="text-xl font-semibold mb-4">CloudWatch Alarms</h2>
-        {alarms.length === 0 ? (
-          <div className="no-alarms">
-            <p>No CloudWatch alarms found in the eu-north-1 region.</p>
-            <p>To create an alarm:</p>
-            <ol className="alarm-steps">
-              <li>Go to AWS CloudWatch Console</li>
-              <li>Click on "Alarms" in the left sidebar</li>
-              <li>Click "Create alarm"</li>
-              <li>Select a metric to monitor</li>
-              <li>Configure the alarm conditions</li>
-            </ol>
-          </div>
-        ) : (
-          <div className="alarms-grid">
-            {alarms.map((alarm, index) => (
-              <div key={index} className={`alarm-card ${alarm.StateValue === 'ALARM' ? 'alarm-active' : 'alarm-ok'}`}>
-                <h3 className="alarm-name">{alarm.AlarmName}</h3>
-                <p className="alarm-state">State: {alarm.StateValue}</p>
-                <p className="alarm-metric">Metric: {alarm.MetricName}</p>
-                <p className="alarm-description">{alarm.AlarmDescription || 'No description available'}</p>
-                <p className="alarm-timestamp">Last Updated: {new Date(alarm.StateUpdatedTimestamp).toLocaleString()}</p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Organized Charts */}
