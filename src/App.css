@@ -1,38 +1,679 @@
-.App {
-  text-align: center;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* SensorDashboard.css */
+
+.dashboard-container {
+  font-family: 'Poppins', sans-serif;
+  padding: 1.5rem;
+  /* background-color: rgb(217, 238, 202); */
+  background-color: rgb(245, 241, 188);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(192, 164, 164, 0.1);
+  max-width: 100%;
+  overflow-x: hidden;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.dashboard-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem; /* Larger title for better prominence */
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+  width: 100%;
+  max-width: 100%;
+  animation: pulse 2s infinite;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary {
+  margin-bottom: 2rem;
+  text-align: center; /* Center summary text */
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: slideInRight 0.8s ease-out;
+  transition: transform 0.3s ease;
+}
+
+.summary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.summary h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.summary p {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.summary strong {
+  color: #ff7300;
+  font-weight: 600;
+}
+
+.time-range-select {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1.1rem; /* Increased font size */
+  width: 100%;
+  max-width: 100%; /* Changed from 200px to 100% */
+  display: flex;
+  justify-content: center;
+  gap: 1rem; /* Added gap between options */
+  animation: slideInRight 0.8s ease-out 0.2s both;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.time-range-select:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.time-range-select select {
+  padding: 0.5rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  min-width: 200px; /* Minimum width for the select */
+  transition: all 0.3s ease;
+}
+
+.time-range-select select:hover {
+  border-color: #ff7300;
+  box-shadow: 0 0 5px rgba(255, 115, 0, 0.2);
+}
+
+.time-range-select select:focus {
+  outline: none;
+  border-color: #ff7300;
+  box-shadow: 0 0 8px rgba(255, 115, 0, 0.3);
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+
+.pie-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+}
+
+.chart-section {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* margin: 1.5rem 0; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-section h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.area-chart-container,
+.line-chart-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Add specific style for bar chart grid */
+.bar-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+  margin: 2rem 0;
+  padding: 0 2rem;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.bar-chart-section {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: all 0.3s ease;
+  margin: 0 1rem;
+}
+
+.bar-chart-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bar-chart-section h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.bar-chart-container {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  padding: -15px;
+  transition: all 0.3s ease;
+}
+
+.bar-chart-container:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.bar-chart-container .recharts-bar-rectangle {
+  transition: fill 0.3s ease;
+}
+
+.bar-chart-container .recharts-bar-rectangle:hover {
+  fill: #8884d8;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 1200px) {
+  .bar-chart-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .bar-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pie-chart-wrapper {
+  width: 100%;
+  max-width: 350px;
+  margin: 1rem 0;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.pie-chart-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.pie-chart-container {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  min-height: 250px;
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-chart-container .recharts-wrapper {
+  margin: 0 auto;
+  width: 250px !important;
+  height: 250px !important;
+}
+
+.pie-chart-container .recharts-legend-wrapper {
+  padding-top: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.pie-chart-container .recharts-pie-label-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+  fill: #333;
+}
+
+.pie-chart-container .recharts-legend-item-text {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.pie-chart-container .recharts-sector {
+  transition: all 0.3s ease;
+}
+
+.pie-chart-container .recharts-sector:hover {
+  filter: brightness(1.1);
+  stroke: white;
+  stroke-width: 2;
+}
+
+.pie-chart-container .recharts-tooltip-wrapper {
+  background: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.pie-chart-container .recharts-tooltip-label {
+  color: #333;
+  font-weight: 600;
+}
+
+.pie-chart-container .recharts-tooltip-item {
+  color: #666;
+}
+
+/* Media query for smaller screens */
+@media screen and (max-width: 600px) {
+  .chart-grid {
+    grid-template-columns: 1fr; /* Stack chart sections on small screens */
   }
-  to {
-    transform: rotate(360deg);
+
+  .chart-section h2,
+  .chart-section h3 {
+    font-size: 1rem; /* Smaller text for better readability */
+  }
+
+  .recharts-responsive-container {
+  width: 100%!important;
+    min-height: auto;
+  }
+
+  .pie-chart-wrapper {
+    max-width: 100%; /* Make pie charts full width on small screens */
+  }
+
+  .time-range-select {
+    max-width: 100%; /* Expand the time range control on small screens */
+  }
+}
+
+/* Specific sizes for chart containers */
+.area-chart-container {
+  width: 100%;
+
+  height: auto;
+  min-height: 500px;
+}
+
+.line-chart-container {
+  width: 100%;
+  height: auto;
+  min-height: 500px;
+}
+
+.pie-chart-container {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  min-height: 300px;
+}
+
+/* Remove all outlines and borders from pie chart elements */
+.pie-chart-container *:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pie-chart-container .recharts-pie-sector:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Add smooth hover effect */
+.pie-chart-container .recharts-pie-sector {
+  transition: all 0.3s ease;
+}
+
+.pie-chart-container .recharts-pie-sector:hover {
+  filter: brightness(1.2);
+}
+
+/* Alarms Section Styles */
+.alarms-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alarms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.alarm-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.alarm-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alarm-active {
+  border-left: 4px solid #ff4444;
+  background-color: #fff5f5;
+}
+
+.alarm-ok {
+  border-left: 4px solid #00C851;
+  background-color: #f5fff5;
+}
+
+.alarm-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.alarm-state {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alarm-metric {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.alarm-description {
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.alarm-timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.no-alarms {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-alarms p {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.alarm-steps {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 1rem;
+}
+
+.alarm-steps li {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+/* Alerts Section Styles */
+.alerts-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.alert-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.alert-active {
+  border-left: 4px solid #ffbb33;
+  background-color: #fff9e6;
+}
+
+.alert-ok {
+  border-left: 4px solid #00C851;
+  background-color: #f5fff5;
+}
+
+.alert-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.alert-state {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alert-metric {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.alert-description {
+  color: #666;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.alert-timestamp {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.no-alerts {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-alerts p {
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+.alert-steps {
+  text-align: left;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 1rem;
+}
+
+.alert-steps li {
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+/* Add specific spacing for pie chart sections */
+.chart-section.pie-chart-wrapper {
+  margin: 1.5rem 0;
+  padding: 20px;
+}
+
+.section-title {
+  text-align: center;
+  margin: 3rem 0 2rem;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.section-title h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: inline-block;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ddd;
+  z-index: 0;
+}
+
+.temperature-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  gap: 0.5rem;
+}
+
+.temperature-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.temperature-indicator svg {
+  animation: pulse 2s infinite;
+  vertical-align: middle;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
   }
 }
