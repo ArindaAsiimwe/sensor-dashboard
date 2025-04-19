@@ -173,7 +173,10 @@ function SensorDashboard() {
         </select>
       </div>
 
-      {/* Organized Charts */}
+      {/* Line Charts Section */}
+      <div className="section-title">
+        <h2>LINE PLOTS</h2>
+      </div>
       <div className="chart-grid">
         <div className="chart-section">
           <h2>Temperature vs Time</h2>
@@ -246,7 +249,127 @@ function SensorDashboard() {
         </div>
       </div>
 
+      {/* Pie Charts Section */}
+      <div className="section-title">
+        <h2>PIE CHARTS</h2>
+      </div>
+      <div className="chart-grid">
+        <div className="pie-chart-wrapper">
+          <h3>Temperature Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie
+                data={tempGroups}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                innerRadius={60}
+                paddingAngle={2}
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+              >
+                {tempGroups.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} readings`, name]}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                formatter={(value) => <span style={{ color: '#666' }}>{value}</span>}
+              />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="pie-chart-wrapper">
+          <h3>Humidity Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie
+                data={humidityGroups}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                innerRadius={60}
+                paddingAngle={2}
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+              >
+                {humidityGroups.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} readings`, name]}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                formatter={(value) => <span style={{ color: '#666' }}>{value}</span>}
+              />
+            </PieChart>
+          </div>
+        </div>
+
+        <div className="pie-chart-wrapper">
+          <h3>Battery Voltage Distribution</h3>
+          <div className="pie-chart-container">
+            <PieChart width={300} height={300}>
+              <Pie
+                data={batteryGroups}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                innerRadius={60}
+                paddingAngle={2}
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+              >
+                {batteryGroups.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value, name) => [`${value} readings`, name]}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                formatter={(value) => <span style={{ color: '#666' }}>{value}</span>}
+              />
+            </PieChart>
+          </div>
+        </div>
+      </div>
+
       {/* Bar Charts Section */}
+      <div className="section-title">
+        <h2>BAR PLOTS</h2>
+      </div>
       <div className="bar-chart-grid">
         <div className="bar-chart-section">
           <h2>Daily Average Temperature</h2>
@@ -296,51 +419,6 @@ function SensorDashboard() {
                 <Bar dataKey="battery_voltage" fill="#82ca9d" />
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Pie Charts Section */}
-      <div className="chart-grid">
-        <div className="chart-section pie-chart-wrapper">
-          <h3>Temperature Distribution</h3>
-          <div className="pie-chart-container">
-            <PieChart width={300} height={300}>
-              <Pie data={tempGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {tempGroups.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </div>
-        </div>
-
-        <div className="chart-section pie-chart-wrapper">
-          <h3>Humidity Distribution</h3>
-          <div className="pie-chart-container">
-            <PieChart width={300} height={300}>
-              <Pie data={humidityGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {humidityGroups.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
-          </div>
-        </div>
-
-        <div className="chart-section pie-chart-wrapper">
-          <h3>Battery Voltage Distribution</h3>
-          <div className="pie-chart-container">
-            <PieChart width={300} height={300}>
-              <Pie data={batteryGroups} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {batteryGroups.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend verticalAlign="bottom" height={36} />
-            </PieChart>
           </div>
         </div>
       </div>

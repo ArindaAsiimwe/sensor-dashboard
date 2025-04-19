@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 /* SensorDashboard.css */
 
 .dashboard-container {
+  font-family: 'Poppins', sans-serif;
   padding: 1.5rem;
   /* background-color: rgb(217, 238, 202); */
   background-color: rgb(245, 241, 188);
@@ -11,6 +14,7 @@
 }
 
 .dashboard-title {
+  font-family: 'Poppins', sans-serif;
   font-size: 2rem; /* Larger title for better prominence */
   font-weight: 700;
   margin-bottom: 1.5rem;
@@ -39,9 +43,10 @@
 .chart-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
+  gap: 3rem; /* Increased gap between all charts */
   margin-top: 2rem;
   justify-items: center;
+  padding: 2rem 0; /* Added more padding to the grid container */
 }
 
 /* Add specific style for bar chart grid */
@@ -81,17 +86,96 @@
 
 .chart-section h2,
 .chart-section h3 {
+  font-family: 'Poppins', sans-serif;
   font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
   color: #333;
   text-align: center;
 }
 
 .pie-chart-wrapper {
   width: 100%;
-  max-width: 400px;
-  margin-top: 1rem;
+  max-width: 350px;
+  margin: 1rem 0;
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-chart-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pie-chart-container {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  min-height: 250px;
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-chart-container .recharts-wrapper {
+  margin: 0 auto;
+  width: 250px !important;
+  height: 250px !important;
+}
+
+.pie-chart-container .recharts-legend-wrapper {
+  padding-top: 1rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.pie-chart-container .recharts-pie-label-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+  fill: #333;
+}
+
+.pie-chart-container .recharts-legend-item-text {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.pie-chart-container .recharts-sector {
+  transition: all 0.3s ease;
+}
+
+.pie-chart-container .recharts-sector:hover {
+  filter: brightness(1.1);
+  stroke: white;
+  stroke-width: 2;
+}
+
+.pie-chart-container .recharts-tooltip-wrapper {
+  background: white;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.pie-chart-container .recharts-tooltip-label {
+  color: #333;
+  font-weight: 600;
+}
+
+.pie-chart-container .recharts-tooltip-item {
+  color: #666;
 }
 
 /* Media query for smaller screens */
@@ -138,7 +222,7 @@
   width: 100%;
   max-width: 350px;
   height: auto;
-  min-height: 450px;
+  min-height: 300px;
 }
 
 /* Remove all outlines and borders from pie chart elements */
@@ -370,4 +454,41 @@
 
 .bar-chart-container .recharts-bar-rectangle:hover {
   fill: #8884d8;
+}
+
+/* Add specific spacing for pie chart sections */
+.chart-section.pie-chart-wrapper {
+  margin: 1.5rem 0;
+  padding: 20px;
+}
+
+.section-title {
+  text-align: center;
+  margin: 3rem 0 2rem;
+  padding: 0.5rem 0;
+  position: relative;
+}
+
+.section-title h2 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: inline-block;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ddd;
+  z-index: 0;
 }
