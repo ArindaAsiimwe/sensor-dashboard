@@ -38,10 +38,33 @@
 
 .chart-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive columns */
-  gap: 1.5rem; /* Increased gap for better spacing */
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
   margin-top: 2rem;
   justify-items: center;
+}
+
+/* Add specific style for bar chart grid */
+.bar-chart-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto 0;
+}
+
+.bar-chart-section {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.bar-chart-section:hover {
+  transform: translateY(-5px);
 }
 
 .chart-section {
@@ -106,9 +129,9 @@
 
 .line-chart-container {
   width: 100%;
-
   height: auto;
   min-height: 300px;
+  margin-bottom: 3rem;
 }
 
 .pie-chart-container {
@@ -326,4 +349,25 @@
 .alert-steps li {
   margin-bottom: 0.5rem;
   color: #666;
+}
+
+.bar-chart-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.bar-chart-container:hover {
+  transform: translateY(-5px);
+}
+
+.bar-chart-container .recharts-bar-rectangle {
+  transition: fill 0.2s ease-in-out;
+}
+
+.bar-chart-container .recharts-bar-rectangle:hover {
+  fill: #8884d8;
 }

@@ -3,13 +3,47 @@ import '../App.css';
 import React, { useEffect, useState } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { listSensorsData } from '../graphql/queries';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Label } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Label, BarChart, Bar, ResponsiveContainer } from 'recharts';
 import { PieChart, Pie, Cell, Legend } from 'recharts';
 import { AreaChart, Area } from 'recharts';
 
 // Format timestamp for x-axis
 function formatTimestamp(ts) {
   return ts ? new Date(ts).toLocaleTimeString() : "Invalid";
+}
+
+// Add this function near the top with other format functions
+function formatDate(ts) {
+  return ts ? new Date(ts).toLocaleDateString() : "Invalid";
+}
+
+// Add this function to calculate daily averages
+function calculateDailyAverages(sensors) {
+  const dailyData = {};
+  
+  sensors.forEach(sensor => {
+    const date = new Date(sensor.timestamp).toLocaleDateString();
+    if (!dailyData[date]) {
+      dailyData[date] = {
+        date,
+        temperature: 0,
+        humidity: 0,
+        battery_voltage: 0,
+        count: 0
+      };
+    }
+    dailyData[date].temperature += sensor.temperature;
+    dailyData[date].humidity += sensor.humidity;
+    dailyData[date].battery_voltage += sensor.battery_voltage;
+    dailyData[date].count += 1;
+  });
+
+  return Object.values(dailyData).map(data => ({
+    date: data.date,
+    temperature: (data.temperature / data.count).toFixed(2),
+    humidity: (data.humidity / data.count).toFixed(2),
+    battery_voltage: (data.battery_voltage / data.count).toFixed(2)
+  }));
 }
 
 function SensorDashboard() {
@@ -208,6 +242,60 @@ function SensorDashboard() {
               <Line type="monotone" dataKey="humidity" stroke="#00bfff" dot={false} name="Humidity (%)" />
               <Line type="monotone" dataKey="battery_voltage" stroke="#82ca9d" dot={false} name="Battery (V)" />
             </LineChart>
+          </div>
+        </div>
+      </div>
+
+      {/* Bar Charts Section */}
+      <div className="bar-chart-grid">
+        <div className="bar-chart-section">
+          <h2>Daily Average Temperature</h2>
+          <div className="bar-chart-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={calculateDailyAverages(sensors)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis>
+                  <Label value="Temperature (°C)" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Bar dataKey="temperature" fill="#ff7300" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bar-chart-section">
+          <h2>Daily Average Humidity</h2>
+          <div className="bar-chart-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={calculateDailyAverages(sensors)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis>
+                  <Label value="Humidity (%)" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Bar dataKey="humidity" fill="#00bfff" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bar-chart-section">
+          <h2>Daily Average Battery Voltage</h2>
+          <div className="bar-chart-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={calculateDailyAverages(sensors)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis>
+                  <Label value="Voltage (V)" angle={-90} position="insideLeft" />
+                </YAxis>
+                <Tooltip />
+                <Bar dataKey="battery_voltage" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
